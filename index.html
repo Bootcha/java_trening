@@ -1,51 +1,35 @@
-
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
-    <script src="https://d3js.org/d3.v4.min.js"></script>
-   <!-- <script type="text/javascript" src="d3/d3.js"></script>
-    <script type="text/javascript" src="d3/d3.geom.js"></script>
-    <script type="text/javascript" src="d3/d3.layout.js"></script>
-    <link type="text/css" rel="stylesheet" href="style.css"/>
-    <style type="text/css"> -->
-<style>
-circle {
-  stroke: #000;
-  stroke-opacity: .5;
-}
+<meta charset="utf-8">
+<body>
+<script src="//d3js.org/d3.v3.min.js"></script>
+<script>
 
-    </style>
-  </head>
-  <body>
-    <script>
-
-var w = 1280,
-    h = 800;
+var width = 960,
+    height = 500;
 
 var nodes = d3.range(200).map(function() { return {radius: Math.random() * 12 + 4}; }),
+    root = nodes[0],
     color = d3.scale.category10();
+
+root.radius = 0;
+root.fixed = true;
 
 var force = d3.layout.force()
     .gravity(0.05)
     .charge(function(d, i) { return i ? 0 : -2000; })
     .nodes(nodes)
-    .size([w, h]);
-
-var root = nodes[0];
-root.radius = 0;
-root.fixed = true;
+    .size([width, height]);
 
 force.start();
 
-var svg = d3.select("#body").append("svg:svg")
-    .attr("width", w)
-    .attr("height", h);
+var svg = d3.select("body").append("svg")
+    .attr("width", width)
+    .attr("height", height);
 
 svg.selectAll("circle")
     .data(nodes.slice(1))
-  .enter().append("svg:circle")
-    .attr("r", function(d) { return d.radius - 2; })
+  .enter().append("circle")
+    .attr("r", function(d) { return d.radius; })
     .style("fill", function(d, i) { return color(i % 3); });
 
 force.on("tick", function(e) {
@@ -53,9 +37,7 @@ force.on("tick", function(e) {
       i = 0,
       n = nodes.length;
 
-  while (++i < n) {
-    q.visit(collide(nodes[i]));
-  }
+  while (++i < n) q.visit(collide(nodes[i]));
 
   svg.selectAll("circle")
       .attr("cx", function(d) { return d.x; })
@@ -63,7 +45,7 @@ force.on("tick", function(e) {
 });
 
 svg.on("mousemove", function() {
-  var p1 = d3.svg.mouse(this);
+  var p1 = d3.mouse(this);
   root.px = p1[0];
   root.py = p1[1];
   force.resume();
@@ -89,13 +71,8 @@ function collide(node) {
         quad.point.y += y;
       }
     }
-    return x1 > nx2
-        || x2 < nx1
-        || y1 > ny2
-        || y2 < ny1;
+    return x1 > nx2 || x2 < nx1 || y1 > ny2 || y2 < ny1;
   };
 }
 
-    </script>
-  </body>
-</html>
+</script>
